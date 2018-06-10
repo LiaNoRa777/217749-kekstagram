@@ -39,7 +39,9 @@ var urlIndexes = getRandomUnique(1, 25);
 
 var photos = [];
 
-for (var h = 0; h < 25; h++) {
+var PHOTOS_AMOUNT = 25;
+
+for (var h = 0; h < PHOTOS_AMOUNT; h++) {
   photos[h] = {
     url: 'photos/' + urlIndexes[h] + '.jpg',
     likes: getRandom(15, 200),
@@ -49,6 +51,7 @@ for (var h = 0; h < 25; h++) {
 }
 
 var photoTemplate = document.querySelector('#picture').content.querySelector('.picture__link');
+var commentTemplate = document.querySelector('#picture').content.querySelector('.social__comment');
 
 var createPhoto = function (photo) {
   var photoElement = photoTemplate.cloneNode(true);
@@ -66,9 +69,9 @@ var createPhoto = function (photo) {
 
 var showPhoto = function () {
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i < photos.length; i++) {
-    fragment.appendChild(createPhoto(photos[i]));
-  }
+  photos.forEach(function (elem, index) {
+    fragment.appendChild(createPhoto(photos[index]));
+  });
   document.querySelector('.pictures').appendChild(fragment);
 };
 
@@ -85,17 +88,20 @@ var commentsList = getComments(photos[0]);
 var avatarPhoto = getRandomUnique(1, 6);
 
 var createComments = function (i) {
-  var socialComment = '<li class="social__comment social__comment--text"><img class="social__picture" src="img/avatar-'
-   + avatarPhoto[i] + '.svg" alt="Аватар комментатора фотографии" width="35" height="35">' + commentsList[i] + '</li>';
-  return socialComment;
+  var commentElement = commentTemplate.cloneNode(true);
+  commentElement.querySelector('.social__picture').setAttribute('src', 'img/avatar-' + avatarPhoto[i] + '.svg');
+  commentElement.querySelector('span').textContent = commentsList[i];
+  return commentElement;
 };
 
 var showComments = function () {
+  var fragment = document.createDocumentFragment();
   var socialComments = document.querySelector('.social__comments');
-  socialComments.innerHTML = createComments(0);
-  for (var i = 1; i < photos[0].comments; i++) {
-    socialComments.innerHTML += createComments(i);
+  socialComments.innerHTML = '';
+  for (var i = 0; i < photos[0].comments; i++) {
+    fragment.appendChild(createComments(i));
   }
+  socialComments.appendChild(fragment);
 };
 
 showPhoto();
