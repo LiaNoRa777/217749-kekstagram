@@ -107,7 +107,82 @@ var showComments = function () {
 showPhoto();
 showComments();
 
+document.querySelector('.social__comment-count').classList.add('visually-hidden');
+document.querySelector('.social__loadmore').classList.add('visually-hidden');
 
-document.querySelector('.big-picture').classList.remove('hidden');
-document.querySelector('.social__comment-count').classList.add('.visually-hidden');
-document.querySelector('.social__comment-loadmore').classList.add('.visually-hidden');
+var allPhotos = document.querySelectorAll('.picture__link');
+
+allPhotos.forEach(function (elem, index) {
+  allPhotos[index].addEventListener('click', function () {
+    document.querySelector('.big-picture').classList.remove('hidden');
+  });
+});
+
+var ESC_KEYCODE = 27;
+
+var onSetupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeOverlay();
+  }
+};
+
+var openOverlay = function () {
+  document.querySelector('.img-upload__overlay').classList.remove('hidden');
+
+  document.addEventListener('keydown', onSetupEscPress);
+};
+
+document.querySelector('.img-upload__cancel').addEventListener('click', function () {
+  closeOverlay();
+});
+
+var closeOverlay = function () {
+  document.querySelector('.img-upload__overlay').classList.add('hidden');
+  document.removeEventListener('keydown', onSetupEscPress);
+  document.querySelector('.img-filters__form').reset();
+};
+
+document.querySelector('#upload-file').addEventListener('change', function () {
+  openOverlay();
+});
+
+var test = document.querySelector('.img-upload__preview img');
+
+var scaleValue = document.querySelector('.scale__value');
+var scalePin = document.querySelector('.scale__pin');
+//scalePin.addEventListener('mouseup', function () {
+
+//});
+
+document.querySelector('[for="effect-none"]').addEventListener('click', function () {
+  //scaleValue
+  test.setAttribute('class', '');
+  test.classList.add('effects__preview--none');
+});
+
+document.querySelector('[for="effect-chrome"]').addEventListener('click', function () {
+  test.setAttribute('class', '');
+  test.classList.add('effects__preview--chrome');
+});
+
+document.querySelector('[for="effect-sepia"]').addEventListener('click', function () {
+  test.setAttribute('class', '');
+  test.classList.add('effects__preview--sepia');
+});
+
+document.querySelector('[for="effect-marvin"]').addEventListener('click', function () {
+  test.setAttribute('class', '');
+  test.classList.add('effects__preview--marvin');
+});
+
+document.querySelector('[for="effect-phobos"]').addEventListener('click', function () {
+  test.setAttribute('class', '');
+  test.classList.add('effects__preview--phobos');
+});
+
+document.querySelector('[for="effect-heat"]').addEventListener('click', function () {
+  test.setAttribute('class', '');
+  test.classList.add('effects__preview--heat');
+});
+
+
