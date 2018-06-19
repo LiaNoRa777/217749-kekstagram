@@ -352,36 +352,3 @@ buttonSubmitNewImage.addEventListener('click', function () {
     }
   }
 });
-
-/*
-
- t1 === hashtagValue
-
-var getRandomUnique = function (min, max) {
-  var uniqueNumber = [];
-  for (var i = 0; i <= (max - min); i++) {
-    var randomNumber = getRandom(min, max);
-    if (uniqueNumber.indexOf(randomNumber) === -1) {
-      uniqueNumber[i] = randomNumber;
-    } else {
-      i -= 1;
-    }
-  }
-  return uniqueNumber;
-};
-
-
-
-hashtags.addEventListener('invalid', function () {
-  if (hashtags.validity.customError) {
-    hashtags.setCustomValidity('fkdjflgkdjflg');
-  }
-  if (hashtags.validity.valueMissing) {
-    hashtags.setCustomValidity('ролпро апр');
-  }
-});*/
-
-/*
-for (var i = 0; i < hashtagValue; i++) {
-  hashtagValue.indexOf[0]
-}*/
