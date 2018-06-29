@@ -7,6 +7,7 @@
   var buttonSubmitNewImage = window.formPhotoEffects.querySelector('.img-upload__submit');
 
   buttonSubmitNewImage.addEventListener('click', function () {
+
     var hashtagValue = window.hashtags.value.split(' ');
 
     hashtagValue.forEach(function (elem, index) {
@@ -37,30 +38,43 @@
         return flagNotUnique;
       };
 
+      var colorizeToRed = function () {
+        window.hashtags.style = 'border-color: red;';
+      };
+
       for (var i = 0; i < hashtagValue.length; i++) {
 
         if (hashtagValue.length > 5) {
           window.hashtags.setCustomValidity('Максимальное количество хэштегов - 5');
+          colorizeToRed();
           return;
         } else if (hashtagValue[i][0] !== '#') {
           window.hashtags.setCustomValidity('Хэштег должен начинаться с символа решетки "#"');
+          colorizeToRed();
           return;
         } else if (hashtagValue[i].length < 2) {
           window.hashtags.setCustomValidity('Хэштег не должен состоять из одной решетки');
+          colorizeToRed();
           return;
         } else if (countHash(i) > 1) {
           window.hashtags.setCustomValidity('Хэштеги должны разделяться пробелами');
+          colorizeToRed();
           return;
         } else if (hashtagValue[i].length > 20) {
           window.hashtags.setCustomValidity('Максимальная длина хэштега - 20 символов');
+          colorizeToRed();
           return;
         } else if (checkHashtagUniqueness(i)) {
           window.hashtags.setCustomValidity('Один и тот же хэштег не может быть использован дважды');
+          colorizeToRed();
           return;
         } else {
           window.hashtags.setCustomValidity('');
         }
       }
+    } else {
+      window.hashtags.setCustomValidity('');
+      window.hashtags.style = null;
     }
   });
 })();

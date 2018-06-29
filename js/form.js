@@ -1,10 +1,10 @@
 'use strict';
 
-// Открытие и закрытие popup с формой загрузки новой фотографии
+// Открытие и закрытие popup с формой загрузки новой фотографии, отправка данных формы на сервер
 
 (function () {
   var onSetupEscPress = function (evt) {
-    window.isEscEvent(evt, onCloseOverlay);
+    window.utils.isEscEvent(evt, onCloseOverlay);
   };
 
   window.formPhotoEffects = document.querySelector('.img-upload__form');
@@ -37,5 +37,10 @@
     onOpenOverlay();
     var inputLoadNewFile = document.querySelector('.img-upload__input');
     window.effectsVars.newImg.src = 'img/' + inputLoadNewFile.files[0].name;
+  });
+
+  window.formPhotoEffects.addEventListener('submit', function (evt) {
+    window.load.upload(new FormData(window.formPhotoEffects), onCloseOverlay, window.load.errorHandler);
+    evt.preventDefault();
   });
 })();
