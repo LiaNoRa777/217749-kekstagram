@@ -3,6 +3,7 @@
 (function () {
   var URL_DOWNLOAD = 'https://js.dump.academy/kekstagram/data';
   var URL_UPLOAD = 'https://js.dump.academy/kekstagram';
+  var SUCCESS_CODE = 200;
 
   var errorTemplate = document.querySelector('#picture').content.querySelector('.img-upload__message--error');
   var errorElement = errorTemplate.cloneNode(true);
@@ -10,22 +11,7 @@
   document.body.appendChild(errorElement);
 
   window.load = {
-    errorHandler: function (errorMessage) {
-      var errorAlert = document.querySelector('.img-upload__message--error');
-      var errorLink = document.querySelector('.error__link');
-      var node = document.createElement('div');
-
-      node.style = 'margin-top: 70px; color: white; font-size: 30px; font-weight: bold; text-align: center;';
-
-      node.textContent = errorMessage;
-      errorAlert.appendChild(node);
-
-      errorAlert.classList.remove('hidden');
-
-      errorLink.addEventListener('click', function () {
-        errorAlert.classList.add('hidden');
-      });
-    },
+    errorAlert: document.querySelector('.img-upload__message--error'),
 
     download: function (onLoad, onError) {
 
@@ -33,7 +19,8 @@
       xhr.responseType = 'json';
 
       xhr.addEventListener('load', function () {
-        if (xhr.status === 200) {
+        if (xhr.status === SUCCESS_CODE) {
+          window.load.errorAlert.classList.add('hidden');
           onLoad(xhr.response);
         } else {
           onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
@@ -55,7 +42,8 @@
       xhr.responseType = 'json';
 
       xhr.addEventListener('load', function () {
-        if (xhr.status === 200) {
+        if (xhr.status === SUCCESS_CODE) {
+          window.load.errorAlert.classList.add('hidden');
           onLoad(xhr.response);
         } else {
           onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
