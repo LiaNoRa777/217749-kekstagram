@@ -21,63 +21,13 @@
   var scalePin = window.formPhotoEffects.querySelector('.scale__pin');
 
   var scale = window.formPhotoEffects.querySelector('.img-upload__scale');
-  scaleValue.setAttribute('value', '100'); // при замене на scaleValue.value при нахождении ползунка где-то на шкале на сервер вместо нужного значения отправляется 100
+  scaleValue.setAttribute('value', '100');
 
   scalePin.style.left = 100 + '%';
 
-
-  // Смена эффекта
-
-  var setScaleLevel = function (x) {
-    scalePin.style.left = x + '%';
-    scaleLevel.style.width = x + '%';
-  };
-
-  window.effectsVars = {
-    newImg: window.formPhotoEffects.querySelector('.img-upload__preview img'),
-    sizeValue: window.formPhotoEffects.querySelector('.resize__control--value'),
-    currentEffect: 'null'
-  };
-
-  window.formPhotoEffects.addEventListener('change', function (evt) {
-    evt.preventDefault();
-
-    scale.style = 'display: none';
-    window.effectsVars.newImg.style = null;
-
-    var target = evt.target;
-    if (target.type === 'radio' && target.name === 'effect') {
-      var effect = target.id.slice(target.id.indexOf('-') + 1);
-
-      window.effectsVars.sizeValue.value = '100%';
-
-      if (effect === 'none') {
-        scale.style = 'display: none';
-      } else {
-        scale.style = null;
-        setScaleLevel(100);
-        scaleValue.setAttribute('value', '100'); // при замене на scaleValue.value при нахождении ползунка где-то на шкале на сервер вместо нужного значения отправляется 100
-      }
-
-      if (window.effectsVars.currentEffect) {
-        window.effectsVars.newImg.classList.remove(window.effectsVars.currentEffect);
-        window.effectsVars.newImg.style = null;
-        scaleValue.setAttribute('value', '100'); // при замене на scaleValue.value при нахождении ползунка где-то на шкале на сервер вместо нужного значения отправляется 100
-      }
-
-      window.effectsVars.currentEffect = 'effects__preview--' + effect;
-
-      window.effectsVars.newImg.classList.add(window.effectsVars.currentEffect);
-    }
-  });
-
   // Перемещение ползунка
 
-  var scaleLevel = window.formPhotoEffects.querySelector('.scale__level');
-
-  scaleLevel.style.width = '100%';
-
-  scalePin.addEventListener('mousedown', function (downEvt) {
+  var onSliderEffects = function (downEvt) {
     downEvt.preventDefault();
 
     var scaleLine = window.formPhotoEffects.querySelector('.scale__line');
@@ -112,10 +62,7 @@
       if (positionLeftInPercent >= '100') {
         setScaleLevel(100);
       }
-    };
 
-    var onMouseUp = function (upEvt) {
-      upEvt.preventDefault();
       var max = MAXES[effect];
       var positionLeft = getComputedStyle(scalePin).left.slice(0, -2);
       var positionX = Math.round((positionLeft / totalWidth) * 100);
@@ -131,11 +78,66 @@
       }
 
       window.effectsVars.newImg.style.filter = FILTERS[effect] + '(' + currentPosition + ')';
+    };
+
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
 
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     };
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+  };
+
+  // Смена эффекта
+
+  var scaleLevel = window.formPhotoEffects.querySelector('.scale__level');
+
+  scaleLevel.style.width = '100%';
+
+  var setScaleLevel = function (x) {
+    scalePin.style.left = x + '%';
+    scaleLevel.style.width = x + '%';
+  };
+
+  window.effectsVars = {
+    newImg: window.formPhotoEffects.querySelector('.img-upload__preview img'),
+    sizeValue: window.formPhotoEffects.querySelector('.resize__control--value'),
+    currentEffect: 'null'
+  };
+
+  window.formPhotoEffects.addEventListener('change', function (evt) {
+    evt.preventDefault();
+
+    scale.style = 'display: none';
+    window.effectsVars.newImg.style = null;
+
+    var target = evt.target;
+    if (target.type === 'radio' && target.name === 'effect') {
+      var effect = target.id.slice(target.id.indexOf('-') + 1);
+
+      window.effectsVars.sizeValue.value = '100%';
+
+      if (effect === 'none') {
+        scale.style = 'display: none';
+        scalePin.removeEventListener('mousedown', onSliderEffects);
+      } else {
+        scale.style = null;
+        setScaleLevel(100);
+        scaleValue.setAttribute('value', '100');
+        scalePin.addEventListener('mousedown', onSliderEffects);
+      }
+
+      if (window.effectsVars.currentEffect) {
+        window.effectsVars.newImg.classList.remove(window.effectsVars.currentEffect);
+        window.effectsVars.newImg.style = null;
+        scaleValue.setAttribute('value', '100');
+      }
+
+      window.effectsVars.currentEffect = 'effects__preview--' + effect;
+
+      window.effectsVars.newImg.classList.add(window.effectsVars.currentEffect);
+    }
   });
 })();
