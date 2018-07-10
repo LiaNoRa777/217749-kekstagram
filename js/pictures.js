@@ -12,6 +12,8 @@
     'Вот это тачка!'
   ];
 
+  var NEWS_PHOTOS_AMOUNT = 10;
+
   var onBigPictureEscPress = function (evt) {
     window.utils.isEscEvent(evt, onClosebigPicture);
   };
@@ -44,12 +46,14 @@
     document.removeEventListener('keydown', onBigPictureEscPress);
   };
 
+  var picturesContainer = document.querySelector('.pictures');
+
   var showPhoto = function (photos) {
     var fragment = document.createDocumentFragment();
     photos.forEach(function (elem, index) {
       fragment.appendChild(createPhoto(photos[index]));
     });
-    document.querySelector('.pictures').appendChild(fragment);
+    picturesContainer.appendChild(fragment);
   };
 
   var commentTemplate = document.querySelector('#picture').content.querySelector('.social__comment');
@@ -71,10 +75,12 @@
       }
 
       numberShownComments += 5;
+      commentCounter.textContent = numberShownComments + ' из ' + commentsBigImage;
       otherCommentsButton.classList.remove('visually-hidden');
       socialComments.appendChild(fragment);
 
     } else {
+      commentCounter.textContent = commentsBigImage + ' из ' + commentsBigImage;
       for (var k = startNumber; k < commentsBigImage; k++) {
         fragment.appendChild(createComments(photos, index, k));
         otherCommentsButton.classList.add('visually-hidden');
@@ -82,6 +88,10 @@
       socialComments.appendChild(fragment);
     }
   };
+
+  var commentCounter = document.querySelector('.social__comment-count');
+
+  commentCounter.innerHTML = '';
 
   var setBigPicture = function (photos) {
     var allPhotos = document.querySelectorAll('.picture__link');
@@ -109,11 +119,13 @@
         };
 
         if (commentsBigImage <= 5) {
+          commentCounter.textContent = commentsBigImage + ' из ' + commentsBigImage;
           otherCommentsButton.classList.add('visually-hidden');
           showComments(photos, 0, index, commentsBigImage);
         } else {
           showComments(photos, 0, index, 5);
           numberShownComments = 5;
+          commentCounter.textContent = numberShownComments + ' из ' + commentsBigImage;
           otherCommentsButton.classList.remove('visually-hidden');
           otherCommentsButton.addEventListener('click', onShowComments);
         }
@@ -123,16 +135,78 @@
     });
   };
 
+  var imgFilters = document.querySelector('.img-filters');
+  var buttonPopularsImages = imgFilters.querySelector('#filter-popular');
+  var buttonNewImages = imgFilters.querySelector('#filter-new');
+  var buttonDiscussedImages = imgFilters.querySelector('#filter-discussed');
+
+  var deletePhotos = function () {
+    var photoItems = document.querySelectorAll('.picture__link');
+
+    for (var i = 0; i < photoItems.length; i++) {
+      picturesContainer.removeChild(photoItems[i]);
+    }
+  };
+
+  var imgFiltersButtons = imgFilters.querySelectorAll('button');
+
+  var showActiveElement = function (evt) {
+    evt.preventDefault();
+    for (var i = 0; i < imgFiltersButtons.length; i++) {
+      if (imgFiltersButtons[i].classList.contains('img-filters__button--active')) {
+        imgFiltersButtons[i].classList.remove('img-filters__button--active');
+      }
+    }
+    evt.target.classList.add('img-filters__button--active');
+  };
+
+  var filterImages = function (evt, array) {
+    showActiveElement(evt);
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+    var lastTimeout = window.setTimeout(function () {
+      deletePhotos();
+      showPhoto(array);
+      setBigPicture(array);
+    }, 600);
+  };
+
   var onPicturesSuccess = function (photos) {
     showPhoto(photos);
 
-    document.querySelector('.social__comment-count').classList.add('visually-hidden');
+    imgFilters.classList.remove('img-filters--inactive');
+
+    buttonPopularsImages.addEventListener('click', function (evt) {
+      filterImages(evt, photos);
+      return;
+    });
+
+    buttonNewImages.addEventListener('click', function (evt) {
+      var mixedPhotosIndexes = window.utils.getRandomUnique(0, 24);
+      var newPhotos = [];
+      for (var i = 0; i < NEWS_PHOTOS_AMOUNT; i++) {
+        newPhotos[i] = photos[mixedPhotosIndexes[i]];
+      }
+      filterImages(evt, newPhotos);
+      return;
+    });
+
+    buttonDiscussedImages.addEventListener('click', function (evt) {
+      var photosCopy = photos.slice();
+      photosCopy.sort(function (left, right) {
+        return right.comments.length - left.comments.length;
+      });
+      filterImages(evt, photosCopy);
+      return;
+    });
 
     setBigPicture(photos);
   };
 
   var onPicturesError = function (errorMessage) {
     nodeError.classList.remove('hidden');
+    imgFilters.classList.add('img-filters--inactive');
     nodeError.textContent = errorMessage;
   };
 
