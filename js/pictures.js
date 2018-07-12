@@ -48,10 +48,14 @@
 
   var picturesContainer = document.querySelector('.pictures');
 
+  var renderedPhotos = [];
+
   var showPhoto = function (photos) {
     var fragment = document.createDocumentFragment();
-    photos.forEach(function (elem, index) {
-      fragment.appendChild(createPhoto(photos[index]));
+    photos.forEach(function (elem) {
+      var photo = createPhoto(elem);
+      renderedPhotos.push(photo);
+      fragment.appendChild(photo);
     });
     picturesContainer.appendChild(fragment);
   };
@@ -96,7 +100,7 @@
   var setBigPicture = function (photos) {
     var allPhotos = document.querySelectorAll('.picture__link');
 
-    var onShowBigPicture = function () {
+    var showBigPicture = function () {
       bigPicture.classList.remove('hidden');
       bigPictureCloseButton.addEventListener('click', onClosebigPicture);
       document.addEventListener('keydown', onBigPictureEscPress);
@@ -104,7 +108,7 @@
 
     allPhotos.forEach(function (elem, index) {
       allPhotos[index].addEventListener('click', function () {
-        onShowBigPicture();
+        showBigPicture();
 
         var urlBigImage = allPhotos[index].querySelector('img');
         var likesBigImage = allPhotos[index].querySelector('.picture__stat--likes').textContent;
@@ -136,32 +140,25 @@
   };
 
   var imgFilters = document.querySelector('.img-filters');
-  var buttonPopularsImages = imgFilters.querySelector('#filter-popular');
-  var buttonNewImages = imgFilters.querySelector('#filter-new');
-  var buttonDiscussedImages = imgFilters.querySelector('#filter-discussed');
 
   var deletePhotos = function () {
-    var photoItems = document.querySelectorAll('.picture__link');
-
-    for (var i = 0; i < photoItems.length; i++) {
-      picturesContainer.removeChild(photoItems[i]);
-    }
+    renderedPhotos.forEach(function (photo) {
+      photo.remove();
+    });
   };
 
   var imgFiltersButtons = imgFilters.querySelectorAll('button');
 
-  var showActiveElement = function (evt) {
-    evt.preventDefault();
+  var showActiveElement = function () {
     for (var i = 0; i < imgFiltersButtons.length; i++) {
       if (imgFiltersButtons[i].classList.contains('img-filters__button--active')) {
         imgFiltersButtons[i].classList.remove('img-filters__button--active');
       }
     }
-    evt.target.classList.add('img-filters__button--active');
   };
 
-  var filterImages = function (evt, array) {
-    showActiveElement(evt);
+  var filterImages = function (array) {
+    showActiveElement();
     if (lastTimeout) {
       window.clearTimeout(lastTimeout);
     }
@@ -172,33 +169,47 @@
     }, 600);
   };
 
+  var filterPopularsImages = function (array) {
+    filterImages(array);
+    return;
+  };
+
+  var filterNewImages = function (array) {
+    var mixedPhotosIndexes = window.utils.getRandomUnique(0, 24);
+    var newPhotos = [];
+    for (var i = 0; i < NEWS_PHOTOS_AMOUNT; i++) {
+      newPhotos[i] = array[mixedPhotosIndexes[i]];
+    }
+    filterImages(newPhotos);
+    return;
+  };
+
+  var discussedImages = function (array) {
+    var photosCopy = array.slice();
+    photosCopy.sort(function (left, right) {
+      return right.comments.length - left.comments.length;
+    });
+    filterImages(photosCopy);
+    return;
+  };
+
+  var filterForm = document.querySelector('.img-filters__form');
+
   var onPicturesSuccess = function (photos) {
     showPhoto(photos);
 
     imgFilters.classList.remove('img-filters--inactive');
 
-    buttonPopularsImages.addEventListener('click', function (evt) {
-      filterImages(evt, photos);
-      return;
-    });
-
-    buttonNewImages.addEventListener('click', function (evt) {
-      var mixedPhotosIndexes = window.utils.getRandomUnique(0, 24);
-      var newPhotos = [];
-      for (var i = 0; i < NEWS_PHOTOS_AMOUNT; i++) {
-        newPhotos[i] = photos[mixedPhotosIndexes[i]];
+    filterForm.addEventListener('click', function (evt) {
+      evt.preventDefault();
+      if (evt.target.id === 'filter-popular') {
+        filterPopularsImages(photos);
+      } else if (evt.target.id === 'filter-new') {
+        filterNewImages(photos);
+      } else if (evt.target.id === 'filter-discussed') {
+        discussedImages(photos);
       }
-      filterImages(evt, newPhotos);
-      return;
-    });
-
-    buttonDiscussedImages.addEventListener('click', function (evt) {
-      var photosCopy = photos.slice();
-      photosCopy.sort(function (left, right) {
-        return right.comments.length - left.comments.length;
-      });
-      filterImages(evt, photosCopy);
-      return;
+      evt.target.classList.add('img-filters__button--active');
     });
 
     setBigPicture(photos);
