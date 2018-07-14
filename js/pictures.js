@@ -3,7 +3,7 @@
 // Попап с большой фотографией и отображение других фото
 
 (function () {
-  var DESCRIPTION = [
+  var DESCRIPTIONS = [
     'Тестим новую камеру!',
     'Затусили с друзьями на море',
     'Как же круто тут кормят',
@@ -14,8 +14,10 @@
 
   var NEWS_PHOTOS_AMOUNT = 10;
 
+  var TIME_DELAY = 600;
+
   var onBigPictureEscPress = function (evt) {
-    window.utils.isEscEvent(evt, onClosebigPicture);
+    window.utils.isEscEvent(evt, onBigPictureClose);
   };
 
   var photoTemplate = document.querySelector('#picture').content.querySelector('.picture__link');
@@ -34,15 +36,15 @@
   var bigPictureCloseButton = bigPicture.querySelector('.big-picture__cancel');
 
   var numberShownComments;
-  var onShowComments;
+  var onCommentsShow;
 
   var otherCommentsButton = document.querySelector('.social__loadmore');
 
-  var onClosebigPicture = function () {
+  var onBigPictureClose = function () {
     bigPicture.classList.add('hidden');
     numberShownComments = 0;
-    otherCommentsButton.removeEventListener('click', onShowComments);
-    bigPictureCloseButton.removeEventListener('click', onClosebigPicture);
+    otherCommentsButton.removeEventListener('click', onCommentsShow);
+    bigPictureCloseButton.removeEventListener('click', onBigPictureClose);
     document.removeEventListener('keydown', onBigPictureEscPress);
   };
 
@@ -102,7 +104,7 @@
 
     var showBigPicture = function () {
       bigPicture.classList.remove('hidden');
-      bigPictureCloseButton.addEventListener('click', onClosebigPicture);
+      bigPictureCloseButton.addEventListener('click', onBigPictureClose);
       document.addEventListener('keydown', onBigPictureEscPress);
     };
 
@@ -118,7 +120,7 @@
         document.querySelector('.big-picture__img img').src = urlBigImage.src;
         document.querySelector('.likes-count').textContent = likesBigImage;
 
-        onShowComments = function () {
+        onCommentsShow = function () {
           showComments(photos, numberShownComments, index, commentsBigImage);
         };
 
@@ -131,10 +133,10 @@
           numberShownComments = 5;
           commentCounter.textContent = numberShownComments + ' из ' + commentsBigImage;
           otherCommentsButton.classList.remove('visually-hidden');
-          otherCommentsButton.addEventListener('click', onShowComments);
+          otherCommentsButton.addEventListener('click', onCommentsShow);
         }
 
-        document.querySelector('.social__caption').textContent = DESCRIPTION[window.utils.getRandom(0, DESCRIPTION.length - 1)];
+        document.querySelector('.social__caption').textContent = DESCRIPTIONS[window.utils.getRandom(0, DESCRIPTIONS.length - 1)];
       });
     });
   };
@@ -157,16 +159,18 @@
     }
   };
 
+  var lastTimeout;
+
   var filterImages = function (array) {
-    showActiveElement();
     if (lastTimeout) {
       window.clearTimeout(lastTimeout);
     }
-    var lastTimeout = window.setTimeout(function () {
+    showActiveElement();
+    lastTimeout = window.setTimeout(function () {
       deletePhotos();
       showPhoto(array);
       setBigPicture(array);
-    }, 600);
+    }, TIME_DELAY);
   };
 
   var filterPopularsImages = function (array) {

@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var MAXES = {
+  var MaxFilterValue = {
     chrome: 1,
     sepia: 1,
     marvin: '100',
@@ -9,7 +9,7 @@
     heat: 3
   };
 
-  var FILTERS = {
+  var FilterNameEffect = {
     chrome: 'grayscale',
     sepia: 'sepia',
     marvin: 'invert',
@@ -17,20 +17,20 @@
     heat: 'brightness'
   };
 
-  var scaleValue = window.formPhotoEffects.querySelector('.scale__value');
-  var scalePin = window.formPhotoEffects.querySelector('.scale__pin');
+  var scaleValue = window.formNewImg.querySelector('.scale__value');
+  var scalePin = window.formNewImg.querySelector('.scale__pin');
 
-  var scale = window.formPhotoEffects.querySelector('.img-upload__scale');
+  var scale = window.formNewImg.querySelector('.img-upload__scale');
   scaleValue.setAttribute('value', '100');
 
   scalePin.style.left = 100 + '%';
 
   // Перемещение ползунка
 
-  var onSliderEffects = function (downEvt) {
+  var onSliderMove = function (downEvt) {
     downEvt.preventDefault();
 
-    var scaleLine = window.formPhotoEffects.querySelector('.scale__line');
+    var scaleLine = window.formNewImg.querySelector('.scale__line');
 
     var totalWidth = getComputedStyle(scaleLine).width.slice(0, -2);
 
@@ -63,7 +63,7 @@
         setScaleLevel(100);
       }
 
-      var max = MAXES[effect];
+      var max = MaxFilterValue[effect];
       var positionLeft = getComputedStyle(scalePin).left.slice(0, -2);
       var positionX = Math.round((positionLeft / totalWidth) * 100);
       scaleValue.setAttribute('value', positionX);
@@ -77,7 +77,7 @@
         currentPosition += 'px';
       }
 
-      window.effectsVars.newImg.style.filter = FILTERS[effect] + '(' + currentPosition + ')';
+      window.effectsVars.newImg.style.filter = FilterNameEffect[effect] + '(' + currentPosition + ')';
     };
 
     var onMouseUp = function (upEvt) {
@@ -92,7 +92,7 @@
 
   // Смена эффекта
 
-  var scaleLevel = window.formPhotoEffects.querySelector('.scale__level');
+  var scaleLevel = window.formNewImg.querySelector('.scale__level');
 
   scaleLevel.style.width = '100%';
 
@@ -102,16 +102,18 @@
   };
 
   window.effectsVars = {
-    newImg: window.formPhotoEffects.querySelector('.img-upload__preview img'),
-    sizeValue: window.formPhotoEffects.querySelector('.resize__control--value'),
+    newImg: window.formNewImg.querySelector('.img-upload__preview img'),
+    newImgContainer: window.formNewImg.querySelector('.img-upload__preview'),
+    sizeValue: window.formNewImg.querySelector('.resize__control--value'),
     currentEffect: 'null'
   };
 
-  window.formPhotoEffects.addEventListener('change', function (evt) {
+  window.formNewImg.addEventListener('change', function (evt) {
     evt.preventDefault();
 
     scale.style = 'display: none';
     window.effectsVars.newImg.style = null;
+    window.effectsVars.newImgContainer.style = null;
 
     var target = evt.target;
     if (target.type === 'radio' && target.name === 'effect') {
@@ -121,18 +123,19 @@
 
       if (effect === 'none') {
         scale.style = 'display: none';
-        scalePin.removeEventListener('mousedown', onSliderEffects);
+        scalePin.removeEventListener('mousedown', onSliderMove);
       } else {
         scale.style = null;
         setScaleLevel(100);
         scaleValue.setAttribute('value', '100');
-        scalePin.addEventListener('mousedown', onSliderEffects);
+        scalePin.addEventListener('mousedown', onSliderMove);
       }
 
       if (window.effectsVars.currentEffect) {
         window.effectsVars.newImg.classList.remove(window.effectsVars.currentEffect);
         window.effectsVars.newImg.style = null;
         scaleValue.setAttribute('value', '100');
+        window.effectsVars.newImgContainer.style = null;
       }
 
       window.effectsVars.currentEffect = 'effects__preview--' + effect;

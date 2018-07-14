@@ -29,8 +29,8 @@
     },
 
     isEscEvent: function (evt, action) {
-      var commentField = window.formPhotoEffects.querySelector('.text__description');
-      if (evt.keyCode === ESC_KEYCODE && commentField !== document.activeElement && window.hashtags.hashtagsFild !== document.activeElement) {
+      var commentField = window.formNewImg.querySelector('.text__description');
+      if (evt.keyCode === ESC_KEYCODE && commentField !== document.activeElement && window.hashtags.fild !== document.activeElement) {
         action();
       }
     },
